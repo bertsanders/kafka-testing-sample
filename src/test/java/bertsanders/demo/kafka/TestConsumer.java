@@ -1,4 +1,4 @@
-package com.walmart.demo.kafka;
+package bertsanders.demo.kafka;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import com.walmart.demo.kafka.model.CalculationOutput;
-
 import lombok.extern.slf4j.Slf4j;
+
+import bertsanders.demo.kafka.model.CalculationOutput;
 
 @Slf4j
 @Component

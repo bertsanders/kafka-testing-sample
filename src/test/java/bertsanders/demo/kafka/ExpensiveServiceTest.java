@@ -1,4 +1,4 @@
-package com.walmart.demo.kafka;
+package bertsanders.demo.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

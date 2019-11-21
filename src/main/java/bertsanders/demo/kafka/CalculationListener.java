@@ -1,4 +1,4 @@
-package com.walmart.demo.kafka;
+package bertsanders.demo.kafka;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -9,11 +9,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import com.walmart.demo.kafka.model.CalculationInput;
-import com.walmart.demo.kafka.model.CalculationOutput;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import bertsanders.demo.kafka.model.CalculationInput;
+import bertsanders.demo.kafka.model.CalculationOutput;
 
 @Slf4j
 @Component

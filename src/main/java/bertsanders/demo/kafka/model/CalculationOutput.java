@@ -1,4 +1,4 @@
-package com.walmart.demo.kafka.model;
+package bertsanders.demo.kafka.model;
 
 import java.math.BigInteger;
 import java.util.List;

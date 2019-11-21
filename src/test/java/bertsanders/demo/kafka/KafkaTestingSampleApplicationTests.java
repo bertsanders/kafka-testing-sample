@@ -1,6 +1,4 @@
-package com.walmart.demo.kafka;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package bertsanders.demo.kafka;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -8,6 +6,7 @@ import java.util.stream.Stream;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
-import com.walmart.demo.kafka.model.CalculationInput;
+import bertsanders.demo.kafka.model.CalculationInput;
 
 @SpringBootTest
 @EmbeddedKafka(topics = {"${sample.consumer-topic-name}", "${sample.producer-topic-name}"})
@@ -69,8 +68,8 @@ class KafkaTestingSampleApplicationTests {
 
     testConsumer.waitForRecord().orTimeout(CONSUMER_TIMEOUT, TimeUnit.SECONDS)
         .thenAcceptAsync(calculationOutput -> calculationOutput.getPrimes().forEach(prime -> {
-          assertThat(prime).isNotNull();
-          assertThat(prime.isProbablePrime(PRIME_CERTAINTY)).isTrue();
+          Assertions.assertThat(prime).isNotNull();
+          Assertions.assertThat(prime.isProbablePrime(PRIME_CERTAINTY)).isTrue();
         }))
         .join();
   }

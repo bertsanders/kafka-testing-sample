@@ -1,4 +1,4 @@
-package com.walmart.demo.kafka;
+package bertsanders.demo.kafka;
 
 import java.util.Map;
 
@@ -18,8 +18,8 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 
-import com.walmart.demo.kafka.model.CalculationInput;
-import com.walmart.demo.kafka.model.CalculationOutput;
+import bertsanders.demo.kafka.model.CalculationInput;
+import bertsanders.demo.kafka.model.CalculationOutput;
 
 @Configuration
 public class KafkaTestConfig {
