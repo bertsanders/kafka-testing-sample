@@ -12,7 +12,7 @@ spring:
                 headers: false
             value:
               default:
-                type: com.walmart.demo.kafka.model.CalculationInput
+                type: bertsanders.demo.kafka.model.CalculationInput
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringDeserializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
