@@ -1,0 +1,17 @@
+spring:
+  kafka:
+    consumer:
+      group-id: test
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: com.walmart.demo.kafka.model.CalculationInput
+sample:
+  topic-name: testing-kafka
