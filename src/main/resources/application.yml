@@ -13,5 +13,21 @@ spring:
             value:
               default:
                 type: com.walmart.demo.kafka.model.CalculationInput
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            add:
+              type:
+                headers: false
 sample:
-  topic-name: testing-kafka
+  consumer-topic-name: testing-input
+  producer-topic-name: testing-output
+logging:
+  level:
+    com:
+      walmart:
+        demo:
+          kafka: debug
