@@ -30,6 +30,8 @@ public class CalculationListener {
 
   @KafkaListener(topics = "${sample.consumer-topic-name}", autoStartup = "true")
   public void consume(CalculationInput input) {
+    log.debug("Received inputs=" + input.getValues().toString());
+
     List<BigInteger> output = input.getValues().stream()
         .map(expensiveService::nthPrime)
         .collect(Collectors.toList());
