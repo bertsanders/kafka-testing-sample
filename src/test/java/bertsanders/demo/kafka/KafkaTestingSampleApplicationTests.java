@@ -1,24 +1,35 @@
 package bertsanders.demo.kafka;
 
-import java.util.concurrent.TimeUnit;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
 import bertsanders.demo.kafka.model.CalculationInput;
+import bertsanders.demo.kafka.model.CalculationOutput;
 
 @SpringBootTest
 @EmbeddedKafka(topics = {"${sample.consumer-topic-name}", "${sample.producer-topic-name}"})
@@ -32,6 +43,8 @@ class KafkaTestingSampleApplicationTests {
 
   @Value("${sample.consumer-topic-name}")
   private String consumerTopic;
+  @Value("${sample.producer-topic-name}")
+  private String producerTopic;
 
   @Autowired
   private EmbeddedKafkaBroker broker;
@@ -39,13 +52,13 @@ class KafkaTestingSampleApplicationTests {
   private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
   @Autowired
-  private Producer testProducer;
-  @Autowired
-  private TestConsumer testConsumer;
+  private Producer<String, CalculationInput> testProducer;
+  private Consumer<String, CalculationOutput> testConsumer;
 
   @BeforeEach
   void init() {
     waitForKafkaToStart();
+    testConsumer = createSubscriber();
   }
 
   private void waitForKafkaToStart() {
@@ -53,9 +66,24 @@ class KafkaTestingSampleApplicationTests {
         ContainerTestUtils.waitForAssignment(messageListenerContainer, broker.getPartitionsPerTopic()));
   }
 
+  private Consumer<String, CalculationOutput> createSubscriber() {
+    Consumer<String, CalculationOutput> consumer = testConsumerFactory.createConsumer();
+    consumer.subscribe(Collections.singletonList(producerTopic));
+    return consumer;
+  }
+
+  @AfterEach
+  void cleanup() {
+    testConsumer.close();
+  }
+
   @Test
   void contextLoads() {
   }
+
+  @Autowired
+  @Qualifier("testConsumerFactory")
+  private ConsumerFactory<String, CalculationOutput> testConsumerFactory;
 
   @Test
   void testReceivingMessage() {
@@ -66,11 +94,17 @@ class KafkaTestingSampleApplicationTests {
 
     testProducer.send(new ProducerRecord<>(consumerTopic, input));
 
-    testConsumer.waitForRecord().orTimeout(CONSUMER_TIMEOUT, TimeUnit.SECONDS)
-        .thenAcceptAsync(calculationOutput -> calculationOutput.getPrimes().forEach(prime -> {
-          Assertions.assertThat(prime).isNotNull();
-          Assertions.assertThat(prime.isProbablePrime(PRIME_CERTAINTY)).isTrue();
-        }))
-        .join();
+    ConsumerRecords<String, CalculationOutput> poll = testConsumer.poll(Duration.of(CONSUMER_TIMEOUT, ChronoUnit.SECONDS));
+
+    Iterable<ConsumerRecord<String, CalculationOutput>> records = poll.records(producerTopic);
+    assertThat(records).size().as("Producer sent no messages").isEqualTo(1);
+
+    StreamSupport.stream(records.spliterator(), false)
+        .flatMap(cr -> cr.value().getPrimes().stream())
+        .forEach(prime -> {
+          assertThat(prime).isNotNull();
+          assertThat(prime.isProbablePrime(PRIME_CERTAINTY)).isTrue();
+        });
+
   }
 }

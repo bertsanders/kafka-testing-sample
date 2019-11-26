@@ -38,18 +38,20 @@ public class KafkaTestConfig {
   }
 
   @Bean
-  public ConcurrentKafkaListenerContainerFactory<Object, Object> testConsumerContainerFactory(
+  public ConcurrentKafkaListenerContainerFactory testConsumerContainerFactory(
       ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
-      ConsumerFactory<Object, Object> testConsumerFactory) {
-    ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory();
+      ConsumerFactory testConsumerFactory) {
+    ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
     configurer.configure(factory, testConsumerFactory);
     return factory;
   }
 
   @Bean
   public ConsumerFactory testConsumerFactory(EmbeddedKafkaBroker broker) {
-    Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-consumer", "true", broker);
+    Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("some-other-group-name", "true", broker);
     consumerProps.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
+    consumerProps.put("max.poll.records", 1);
+    consumerProps.put("auto.offset.reset", "earliest");
     DefaultKafkaConsumerFactory<String, CalculationOutput> consumerFactory =
         new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(), new JsonDeserializer<>(CalculationOutput.class));
     return consumerFactory;
